@@ -1,0 +1,160 @@
+body {
+  margin: 0;
+  padding: 20px;
+  background-color: #f3f3f3;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 100px; /* 🟢 Espaço para o rodapé */
+}
+
+
+/* CALCULADORA */
+.calculator {
+  background: #1e1e1e;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  padding: 20px;
+}
+
+.display {
+  background-color: #333;
+  color: white;
+  font-size: 2.2rem;
+  text-align: right;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  height: 60px;
+  overflow-x: auto;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+button {
+  font-size: 1.2rem;
+  padding: 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #2d2d2d;
+  color: white;
+  box-shadow: inset 0 -3px 0 #1c1c1c;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:active {
+  background-color: #444;
+}
+
+button.operator {
+  background-color: #0078d4;
+  color: white;
+  box-shadow: inset 0 -3px 0 #005a9e;
+}
+
+button.operator:active {
+  background-color: #005a9e;
+}
+
+button.zero {
+  grid-column: span 2;
+}
+
+/* QR CODE */
+.qr-generator {
+  background: #046ffc;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  padding: 22px;
+  text-align: center;
+}
+
+.qr-generator h2 {
+  margin-bottom: 20px;
+}
+
+.qr-generator input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #0f0f0f;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.btn-green {
+  flex: 1;
+  padding: 12px;
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-green:hover {
+  background-color: #44f76b;
+}
+
+.btn-red {
+  flex: 1;
+  padding: 12px;
+  background-color: #dc3545;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-red:hover {
+  background-color: #c82333;
+}
+
+#qr-code {
+  margin-top: 20px;
+}
+
+/* TÍTULO DO SITE */
+.site-title {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 3px;
+}
+
+
+.site-title h1 {
+  font-size: 1.8rem;
+  color: #333;
+}
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1e1e1e;
+  color: #ccc;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 0.75rem; /* 🟢 Letra menor */
+  z-index: 1000;
+}
