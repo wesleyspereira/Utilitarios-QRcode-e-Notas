@@ -3,66 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora + QR Code</title>
+  <title>QR Code, Planilhas e Códigos</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="container">
-    <!-- Calculadora e Qr Code Gerador -->
-  <header class="site-title">
-    <h1>Calculadora & QR Code</h1>
-  </header>
 
-<footer class="footer">
-  <p>© 2025 Todos os direitos reservados WS.dev</p>
-</footer>
+    <header class="site-title">
+      <h1>QR Code, Planilhas e Códigos</h1>
+    </header>
+
+  <!-- GERADOR QR CODE -->
+<section class="qr-generator app-section">
+  <h2>Gerador de QR Code</h2>
+  <input type="text" id="qr-input" placeholder="Digite um texto ou link" />
+  <div class="btn-group">
+    <button id="generate-btn" class="btn-green">Gerar QR Code</button>
+    <button id="clear-qr" class="btn-red">Apagar</button>
+  </div>
+  <div id="qr-code"></div>
+</section>
+
+<!-- NOTAS -->
+<section class="tab-content app-section" id="planilha">
+  <div class="notas">
+    <h2>Notas e Lembretes</h2>
+    <textarea id="nota-texto" placeholder="Digite sua nota..."></textarea>
+    <div class="prioridade">
+      <button data-prioridade="alta" class="alta">Alta</button>
+      <button data-prioridade="media" class="media">Média</button>
+      <button data-prioridade="baixa" class="baixa">Baixa</button>
+    </div>
+    <button onclick="limparNotas()" class="btn-green">Limpar Notas</button>
+    <div id="bloco-notas"></div>
+  </div>
+</section>
 
 
-  <main class="container">
-
-    <!-- CALCULADORA -->
-    <section class="calculator">
-      <div id="display" class="display">0</div>
-      <div class="buttons">
-        <button id="clear">C</button>
-        <button id="backspace">⌫</button>
-        <button id="percent">%</button>
-        <button class="operator" data-op="/">÷</button>
-
-        <button data-num="7">7</button>
-        <button data-num="8">8</button>
-        <button data-num="9">9</button>
-        <button class="operator" data-op="*">×</button>
-
-        <button data-num="4">4</button>
-        <button data-num="5">5</button>
-        <button data-num="6">6</button>
-        <button class="operator" data-op="-">−</button>
-
-        <button data-num="1">1</button>
-        <button data-num="2">2</button>
-        <button data-num="3">3</button>
-        <button class="operator" data-op="+">+</button>
-
-        <button data-num="0" class="zero">0</button>
-        <button data-num=".">.</button>
-        <button id="equals" class="operator">=</button>
-      </div>
+    <!-- HISTÓRICO -->
+    <section class="historico">
+      <h2>Histórico</h2>
+      <ul>
+        <li>Último QR Code: <a href="qrcode1.png" download>Baixar</a></li>
+        <li>Última Planilha: <a href="planilha.csv" download>Baixar</a></li>
+        <li>Código Lido: <code>123456789</code></li>
+      </ul>
     </section>
 
-    <!-- GERADOR QR CODE -->
-    <section class="qr-generator">
-      <h2>Gerador de QR Code</h2>
-      <input type="text" id="qr-input" placeholder="Digite um texto ou link" />
-      <div class="btn-group">
-        <button id="generate-btn" class="btn-green">Gerar QR Code</button>
-        <button id="clear-qr" class="btn-red">Apagar</button>
-      </div>
-      <div id="qr-code"></div>
+    <!-- LEITOR MANUAL -->
+    <section class="leitor">
+      <h2>Leitor de Código (Manual)</h2>
+      <input type="text" placeholder="Escaneie ou digite o código" />
     </section>
+
+    <footer class="footer">
+      <p>© 2025 Todos os direitos reservados WS.dev</p>
+    </footer>
 
   </main>
 
+  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="script.js"></script>
 </body>
