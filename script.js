@@ -1,104 +1,75 @@
-// --- CALCULADORA ---
-const display = document.getElementById('display');
-let currentInput = '';
-let resultDisplayed = false;
+// === QR Code ===
+const qrBtn = document.getElementById("generate-btn");
+const clearBtn = document.getElementById("clear-qr");
+const qrInput = document.getElementById("qr-input");
+const qrCode = document.getElementById("qr-code");
 
-function updateDisplay(value) {
-  display.textContent = value || '0';
-}
-
-function appendNumber(num) {
-  if (resultDisplayed) {
-    currentInput = '';
-    resultDisplayed = false;
-  }
-  if (num === '.' && currentInput.includes('.')) return;
-  currentInput += num;
-  updateDisplay(currentInput);
-}
-
-function appendOperator(op) {
-  if (resultDisplayed) resultDisplayed = false;
-  if (currentInput === '') return;
-  if (['+', '-', '*', '/'].includes(currentInput.slice(-1))) {
-    currentInput = currentInput.slice(0, -1) + op;
-  } else {
-    currentInput += op;
-  }
-  updateDisplay(currentInput);
-}
-
-function clearAll() {
-  currentInput = '';
-  updateDisplay('0');
-}
-
-function backspace() {
-  currentInput = currentInput.slice(0, -1);
-  updateDisplay(currentInput);
-}
-
-function calculate() {
-  if (!currentInput) return;
-  try {
-    let expr = currentInput.replace(/%/g, '*0.01');
-    let result = Function('"use strict";return (' + expr + ')')();
-    result = Math.round((result + Number.EPSILON) * 1000000000) / 1000000000;
-    updateDisplay(result);
-    currentInput = result.toString();
-    resultDisplayed = true;
-  } catch {
-    updateDisplay('Erro');
-    currentInput = '';
-  }
-}
-
-document.querySelectorAll('.calculator button').forEach(button => {
-  button.addEventListener('click', () => {
-    if (button.hasAttribute('data-num')) {
-      appendNumber(button.getAttribute('data-num'));
-    } else if (button.classList.contains('operator')) {
-      if (button.id === 'equals') {
-        calculate();
-      } else {
-        appendOperator(button.getAttribute('data-op'));
-      }
-    } else if (button.id === 'clear') {
-      clearAll();
-    } else if (button.id === 'backspace') {
-      backspace();
-    } else if (button.id === 'percent') {
-      appendOperator('%');
-    }
-  });
-});
-
-// --- GERADOR DE QR CODE ---
-const qrInput = document.getElementById('qr-input');
-const qrCodeDiv = document.getElementById('qr-code');
-const generateBtn = document.getElementById('generate-btn');
-const clearBtn = document.getElementById('clear-qr');
-
-generateBtn.addEventListener('click', () => {
-  const text = qrInput.value.trim();
-  if (!text) {
-    alert('Digite algo para gerar o QR Code!');
+qrBtn.addEventListener("click", () => {
+  if (qrInput.value.trim() === "") {
+    alert("Digite algo para gerar o QR Code!");
     return;
   }
+  qrCode.innerHTML = "";
+  new QRCode(qrCode, qrInput.value);
+});
 
-  qrCodeDiv.innerHTML = '';
+clearBtn.addEventListener("click", () => {
+  qrCode.innerHTML = "";
+  qrInput.value = "";
+});
 
-  new QRCode(qrCodeDiv, {
-    text: text,
-    width: 256,
-    height: 256,
-    colorDark: "#000000",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
+// === Notas com prioridade ===
+const blocoNotas = document.getElementById("bloco-notas");
+const notaTexto = document.getElementById("nota-texto");
+const prioridadeBtns = document.querySelectorAll(".prioridade button");
+
+prioridadeBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const prioridade = btn.getAttribute("data-prioridade");
+    const nota = notaTexto.value.trim();
+
+    if (!nota) {
+      alert("Digite uma nota antes.");
+      return;
+    }
+
+    const div = document.createElement("div");
+    div.classList.add("nota", prioridade);
+    div.innerText = `[${prioridade.toUpperCase()}] ${nota}`;
+    blocoNotas.appendChild(div);
+    notaTexto.value = "";
   });
 });
 
-clearBtn.addEventListener('click', () => {
-  qrCodeDiv.innerHTML = '';
-  qrInput.value = '';
-});
+// === Limpar notas ===
+function limparNotas() {
+  blocoNotas.innerHTML = "";
+}
+
+// === Gerar planilha CSV ===
+function gerarPlanilha() {
+  const dados = [
+    ["Nota", "Prioridade", "Data"]
+  ];
+
+  const notas = document.querySelectorAll(".nota");
+  notas.forEach(nota => {
+    const prioridade = nota.classList.contains("alta") ? "Alta" :
+                       nota.classList.contains("media") ? "Média" : "Baixa";
+    const texto = nota.innerText.replace(/\[.*?\]\s*/, "");
+    dados.push([texto, prioridade, new Date().toLocaleDateString()]);
+  });
+
+  let csv = "data:text/csv;charset=utf-8,";
+  dados.forEach(row => {
+    csv += row.join(",") + "\n";
+  });
+
+  const encodedUri = encodeURI(csv);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "planilha.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
