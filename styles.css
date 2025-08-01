@@ -89,7 +89,7 @@ button {
 }
 
 .media {
-  background-color: #d4ac0d;
+  background-color: #d2e70e;
   color: white;
 }
 
@@ -107,7 +107,7 @@ button {
 }
 
 .nota.alta { background: #c0392b; }
-.nota.media { background: #f39c12; }
+.nota.media { background: #d2e70e; }
 .nota.baixa { background: #2980b9; }
 
 .excluir-nota {
