@@ -144,8 +144,20 @@ button {
   padding: 10px;
 }
 
+#logout-btn {
+  max-width: 150px;
+  margin: 20px auto;
+  display: block;
+  padding: 10px 20px;
+  text-align: center;
+}
+
 @media (max-width: 600px) {
   .btn-group, .prioridade {
     flex-direction: column;
+  }
+
+  #logout-btn {
+    width: 90%;
   }
 }
