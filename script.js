@@ -6,7 +6,7 @@ function getChave(chave) {
   return `${usuarioAtual}_${chave}`;
 }
 
-// === Referências ===
+// Referências
 const qrBtn = document.getElementById("generate-btn");
 const clearBtn = document.getElementById("clear-qr");
 const qrInput = document.getElementById("qr-input");
@@ -30,10 +30,7 @@ qrBtn.addEventListener("click", () => {
     localStorage.setItem(getChave("qrcode"), texto);
   }
 
-  const li = document.createElement("li");
-  li.innerHTML = `Último QR Code: <a href="#" onclick="baixarQRCode()">Baixar</a>`;
-  historico.innerHTML = "";
-  historico.appendChild(li);
+  atualizarHistoricoQR();
 });
 
 clearBtn.addEventListener("click", () => {
@@ -47,11 +44,17 @@ clearBtn.addEventListener("click", () => {
 
 function baixarQRCode() {
   const img = qrCode.querySelector("img");
-  if (!img) return alert("Nenhum QR Code gerado.");
+  if (!img || !img.src) {
+    alert("Nenhum QR Code disponível para download.");
+    return;
+  }
+
   const link = document.createElement("a");
   link.href = img.src;
-  link.download = "qrcode.png";
+  link.download = `qrcode_${usuarioAtual || 'usuario'}.png`;
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
 }
 
 prioridadeBtns.forEach(btn => {
@@ -89,7 +92,7 @@ function salvarNotas() {
     notas.push({
       texto: nota.innerText.replace("❌", "").trim(),
       prioridade: nota.classList.contains("alta") ? "alta" :
-                  nota.classList.contains("media") ? "media" : "baixa"
+        nota.classList.contains("media") ? "media" : "baixa"
     });
   });
   localStorage.setItem(getChave("notas"), JSON.stringify(notas));
@@ -102,72 +105,23 @@ function limparNotas() {
   }
 }
 
-function gerarPlanilha() {
-  const dados = [["Nota", "Prioridade", "Data"]];
-  const notas = document.querySelectorAll(".nota");
-  notas.forEach(nota => {
-    const prioridade = nota.classList.contains("alta") ? "Alta" :
-                       nota.classList.contains("media") ? "Média" : "Baixa";
-    const texto = nota.innerText.replace(/\[.*?\]\s*/, "").replace("❌", "").trim();
-    dados.push([texto, prioridade, new Date().toLocaleDateString()]);
-  });
-  if (dados.length === 1) {
-    alert("Nenhuma nota para exportar.");
-    return;
-  }
-  let csv = "data:text/csv;charset=utf-8," + dados.map(row => row.join(",")).join("\n");
-  const encodedUri = encodeURI(csv);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "planilha.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  const li = document.createElement("li");
-  li.innerHTML = `Última Planilha: <a href="\${link.download}" download>Baixar</a>`;
-  historico.appendChild(li);
-}
-
-// === LOGIN E REGISTRO ===
-function registrarUsuario() {
-  const nome = document.getElementById("login-nome").value.trim();
-  const senha = document.getElementById("login-senha").value.trim();
-  const mensagem = document.getElementById("login-mensagem");
-  if (!nome || !senha) {
-    mensagem.innerText = "Preencha nome e senha.";
-    return;
-  }
-  const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-  if (usuarios[nome]) {
-    mensagem.innerText = "Usuário já cadastrado.";
-    return;
-  }
-  usuarios[nome] = senha;
-  localStorage.setItem("usuarios", JSON.stringify(usuarios));
-  mensagem.innerText = "Cadastro realizado com sucesso!";
-}
-
-function loginUsuario() {
-  const nome = document.getElementById("login-nome").value.trim();
-  const senha = document.getElementById("login-senha").value.trim();
-  const mensagem = document.getElementById("login-mensagem");
-  const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-  if (usuarios[nome] && usuarios[nome] === senha) {
-    usuarioAtual = nome;
-    document.getElementById("login-container").style.display = "none";
-    document.querySelector("main.container").style.display = "block";
-    mensagem.innerText = "";
-    carregarDados();
-  } else {
-    mensagem.innerText = "Usuário ou senha inválidos.";
+function atualizarHistoricoQR() {
+  historico.innerHTML = "";
+  const ultimoQR = localStorage.getItem(getChave("qrcode"));
+  if (ultimoQR) {
+    const li = document.createElement("li");
+    li.innerHTML = `Último QR Code: <a href="#" onclick="baixarQRCode()">Baixar</a>`;
+    historico.appendChild(li);
   }
 }
 
 function carregarDados() {
   blocoNotas.innerHTML = "";
   qrCode.innerHTML = "";
+  qrInput.value = "";
   historico.innerHTML = "";
+
+  // Carregar notas
   const notasSalvas = JSON.parse(localStorage.getItem(getChave("notas"))) || [];
   notasSalvas.forEach(n => {
     const div = document.createElement("div");
@@ -185,16 +139,71 @@ function carregarDados() {
     div.appendChild(excluirBtn);
     blocoNotas.appendChild(div);
   });
-  const ultimoQR = localStorage.getItem(getChave("qrcode"));
-  if (ultimoQR) {
-    new QRCode(qrCode, ultimoQR);
-    const li = document.createElement("li");
-    li.innerHTML = `Último QR Code: <a href="#" onclick="baixarQRCode()">Baixar</a>`;
-    historico.appendChild(li);
+
+  // Carregar último QR Code no histórico
+  atualizarHistoricoQR();
+}
+
+// === LOGIN E REGISTRO ===
+
+function registrarUsuario() {
+  const nome = document.getElementById("login-nome").value.trim();
+  const senha = document.getElementById("login-senha").value.trim();
+  const mensagem = document.getElementById("login-mensagem");
+  if (!nome || !senha) {
+    mensagem.style.color = "red";
+    mensagem.innerText = "Preencha nome e senha.";
+    return;
   }
-  if (notasSalvas.length > 0) {
-    const li = document.createElement("li");
-    li.innerHTML = `Últimas Notas: \${notasSalvas.length} notas carregadas`;
-    historico.appendChild(li);
+  const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+  if (usuarios[nome]) {
+    mensagem.style.color = "red";
+    mensagem.innerText = "Usuário já cadastrado.";
+    return;
+  }
+  usuarios[nome] = senha;
+  localStorage.setItem("usuarios", JSON.stringify(usuarios));
+  mensagem.style.color = "green";
+  mensagem.innerText = "Cadastro realizado com sucesso!";
+}
+
+function loginUsuario() {
+  const nome = document.getElementById("login-nome").value.trim();
+  const senha = document.getElementById("login-senha").value.trim();
+  const mensagem = document.getElementById("login-mensagem");
+  const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+  if (usuarios[nome] && usuarios[nome] === senha) {
+    usuarioAtual = nome;
+    document.getElementById("login-container").style.display = "none";
+    document.querySelector("main.container").style.display = "block";
+    document.getElementById("logout-btn").style.display = "inline-block";
+    mensagem.innerText = "";
+    document.getElementById("usuario-nome").innerText = usuarioAtual;
+    carregarDados();
+  } else {
+    mensagem.style.color = "red";
+    mensagem.innerText = "Usuário ou senha inválidos.";
   }
 }
+
+function logoutUsuario() {
+  usuarioAtual = "";
+  document.getElementById("login-container").style.display = "block";
+  document.querySelector("main.container").style.display = "none";
+  document.getElementById("logout-btn").style.display = "none";
+  document.getElementById("usuario-nome").innerText = "";
+  document.getElementById("login-mensagem").innerText = "";
+  // Limpar dados visuais
+  blocoNotas.innerHTML = "";
+  qrCode.innerHTML = "";
+  qrInput.value = "";
+  historico.innerHTML = "";
+}
+
+// Inicialização da página
+window.onload = () => {
+  document.getElementById("logout-btn").style.display = "none";
+  document.getElementById("login-container").style.display = "block";
+  document.querySelector("main.container").style.display = "none";
+  usuarioAtual = "";
+};
