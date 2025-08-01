@@ -43,18 +43,39 @@ clearBtn.addEventListener("click", () => {
 });
 
 function baixarQRCode() {
+  // QRCode.js cria <img> ou <canvas> dentro do qrCode
   const img = qrCode.querySelector("img");
-  if (!img || !img.src) {
+  const canvas = qrCode.querySelector("canvas");
+
+  let dataURL = null;
+
+  if (img) {
+    dataURL = img.src;
+  } else if (canvas) {
+    dataURL = canvas.toDataURL("image/png");
+  }
+
+  if (!dataURL) {
     alert("Nenhum QR Code disponível para download.");
     return;
   }
 
-  const link = document.createElement("a");
-  link.href = img.src;
-  link.download = `qrcode_${usuarioAtual || 'usuario'}.png`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // Detecta se é mobile (simplificado)
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    // Abre a imagem em nova aba para salvar manualmente
+    window.open(dataURL, '_blank');
+    alert("Abra a imagem em nova aba e salve manualmente.");
+  } else {
+    // Desktop: tenta download automático
+    const link = document.createElement("a");
+    link.href = dataURL;
+    link.download = `qrcode_${usuarioAtual || 'usuario'}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }
 
 prioridadeBtns.forEach(btn => {
